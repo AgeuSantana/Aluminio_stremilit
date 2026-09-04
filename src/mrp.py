@@ -2,7 +2,7 @@
 Motor de cálculo de MRP (Material Requirements Planning) para compra de alumínio.
 
 Contém funções determinísticas para cálculo de ponto de pedido, autonomia,
-conversão financeira e recomendação de emissão de Purchase Order (PO).
+formação de preço de compra no mercado nacional e recomendação de emissão de PO.
 """
 
 from typing import Dict, Any
@@ -21,8 +21,8 @@ def calcular_rop(consumo_diario: float, lead_time: int, estoque_seguranca: float
 
 def calcular_cobertura(estoque_atual: float, consumo_diario: float) -> float:
     """
-    Calcula a autonomia do estoque em dias.
-    Retorna infinito caso o consumo diário seja zero para evitar ZeroDivisionError.
+    Calcula a autonomia do estoque físico em dias.
+    Retorna infinito se consumo_diario <= 0 para evitar divisão por zero.
     """
     if consumo_diario <= 0:
         return float("inf")
@@ -34,6 +34,38 @@ def converter_preco_brl(preco_usd: float, cambio_usd_brl: float) -> float:
     return preco_usd * cambio_usd_brl
 
 
+def calcular_custo_aquisicao_nacional(
+    preco_lme_usd: float,
+    cambio_usd_brl: float,
+    premio_produtor_usd: float,
+    frete_rodoviario_brl: float,
+    seguro_carga_pct: float
+) -> Dict[str, float]:
+    """
+    Calcula o custo efetivo de aquisição de alumínio no mercado interno.
+
+    Estrutura:
+    1. Preço Faturado Metal (USD) = LME + Prêmio de Produtor
+    2. Custo do Metal (BRL) = Preço Faturado Metal * Câmbio
+    3. Seguro Rodoviário (BRL) = Custo do Metal * (seguro_carga_pct / 100)
+    4. Custo Total em Fábrica (BRL/ton) = Custo do Metal + Frete Rodoviário + Seguro
+    """
+    preco_faturado_usd = preco_lme_usd + premio_produtor_usd
+    custo_metal_brl = preco_faturado_usd * cambio_usd_brl
+    seguro_brl = custo_metal_brl * (seguro_carga_pct / 100.0)
+    custo_total_fabrica_brl = custo_metal_brl + frete_rodoviario_brl + seguro_brl
+
+    return {
+        "lme_usd": round(preco_lme_usd, 2),
+        "premio_usd": round(premio_produtor_usd, 2),
+        "faturado_usd": round(preco_faturado_usd, 2),
+        "metal_brl": round(custo_metal_brl, 2),
+        "frete_brl": round(frete_rodoviario_brl, 2),
+        "seguro_brl": round(seguro_brl, 2),
+        "custo_total_brl_ton": round(custo_total_fabrica_brl, 2)
+    }
+
+
 def avaliar_decisao_compra(
     estoque_atual: float,
     rop: float,
@@ -41,20 +73,17 @@ def avaliar_decisao_compra(
     preco_ton_brl: float
 ) -> Dict[str, Any]:
     """
-    Avalia a condição de ruptura e gera o parecer técnico de ressuprimento.
+    Avalia a condição de estoque contra o ROP e emite parecer técnico de PO.
 
-    Retorna um dicionário estruturado com o status operacional, quantidade sugerida
-    e impacto financeiro estimado.
+    Se estoque_atual <= rop, calcula o volume sugerido cobrindo o déficit
+    e respeitando o Lote Mínimo de Compra (MOQ) em múltiplos inteiros.
     """
     precisa_comprar = estoque_atual <= rop
 
     if precisa_comprar:
-        # Sugestão básica: repor pelo menos o Lote Mínimo (MOQ)
-        # ou o déficit necessário para retornar ao patamar seguro
         deficit = rop - estoque_atual
         volume_sugerido = max(moq, deficit)
-        
-        # Ajuste para múltiplo do MOQ se necessário
+
         if volume_sugerido % moq != 0:
             volume_sugerido = ((volume_sugerido // moq) + 1) * moq
 

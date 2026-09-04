@@ -4,7 +4,12 @@ Ponto de entrada (Entrypoint) da aplicação Streamlit.
 Orquestra os módulos de configuração, coleta de dados, regras de MRP,
 previsão SARIMA e renderização da interface gráfica.
 """
-
+from src.ui_components import (
+    aplicar_estilo_css_customizado,
+    renderizar_kpis,
+    renderizar_alerta_decisao,
+    renderizar_grafico_forecast,
+)
 import streamlit as st
 
 from src.config import (
@@ -40,6 +45,8 @@ st.set_page_config(
     page_icon=PAGE_ICON,
     layout="wide"
 )
+# Aplicação do tema dark e componentes customizados
+aplicar_estilo_css_customizado()
 
 st.title(f"{PAGE_ICON} {PAGE_TITLE}")
 st.caption("Painel Integrado de Suprimentos: Planejamento de Necessidades de Materiais & Gestão de Risco Cambial")
