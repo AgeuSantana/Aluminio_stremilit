@@ -1,5 +1,11 @@
 # 📦 Sistema Integrado de Compras: MRP de Alumínio + Forecast Cambial (SARIMA)
 
+![CI Pipeline](https://github.com/SEU_USUARIO/aluminio_stremilit/actions/workflows/ci.yml/badge.svg)
+![Python Version](https://img.shields.io/badge/python-3.11%20%7C%203.13-blue.svg)
+![Framework](https://img.shields.io/badge/framework-Streamlit-red.svg)
+![Tests](https://img.shields.io/badge/tests-7%20passed-brightgreen.svg)
+![License](https://img.shields.io/badge/license-MIT-green.svg)
+
 Sistema analítico e motor de decisão desenvolvido para **Planejamento e Controle de Produção (PCP)** e **Suprimentos Estratégicos**. Integra a lógica clássica de ressuprimento industrial (MRP) a modelos de previsão de séries temporais (SARIMA) e APIs do mercado financeiro, mitigando riscos de ruptura de estoque e exposição à volatilidade cambial.
 
 ---
