@@ -6,6 +6,12 @@
 ![Tests](https://img.shields.io/badge/tests-7%20passed-brightgreen.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 
+## 🚀 Aplicação online
+
+ [Acesse o dashboard no Streamlit Cloud](https://aluminiostremilit-hruay2ejxasaykwvihembm.streamlit.app/)
+
+**Tópicos:** `python` · `streamlit` · `supply-chain` · `mrp` · `forecasting` · `sarima` · `machine-learning`
+
 Sistema analítico e motor de decisão desenvolvido para **Planejamento e Controle de Produção (PCP)** e **Suprimentos Estratégicos**. Integra a lógica clássica de ressuprimento industrial (MRP) a modelos de previsão de séries temporais (SARIMA) e APIs do mercado financeiro, mitigando riscos de ruptura de estoque e exposição à volatilidade cambial.
 
 ---
